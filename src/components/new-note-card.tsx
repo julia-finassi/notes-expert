@@ -1,7 +1,30 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
+import { ChangeEvent, FormEvent, useState } from 'react'
+import { toast } from 'sonner'
 
 export function NewNoteCard() {
+  const [shouldShowOnboarding, setShouldShowOnboarding] = useState(true)
+  const [content, setContent] = useState('')
+
+  function handleStartEditor() {
+    setShouldShowOnboarding(false)
+  }
+
+  function handleContentChange(event: ChangeEvent<HTMLTextAreaElement>) {
+    setContent(event.target.value)
+    if (event.target.value == '') {
+      setShouldShowOnboarding(true)
+    }
+  }
+
+  function handleSaveNote(event: FormEvent) {
+    event.preventDefault()
+    console.log(content)
+
+    toast.success('Note created successfully')
+  }
+
   return (
     <Dialog.Root>
       <Dialog.Trigger className='rounded-md flex flex-col text-left bg-slate-700 p-5 gap-3 outline-none overflow-hidden hover:ring-2  hover:ring-slate-600 focus-visible:ring-2 focus-visible:ring-lime-400'>
@@ -19,22 +42,34 @@ export function NewNoteCard() {
           <Dialog.Close className='absolute right-0 top-0 bg-slate-800 p-1.5 text-slate-400 hover:text-slate-100'>
             <X className='size-5' />
           </Dialog.Close>
-          <div className='flex flex-1 flex-col gap-3 p-5'>
-            <span className='text-sm font-medium text-slate-200'>
-              Add note
-            </span>
+          <form onSubmit={handleSaveNote} className='flex-1 flex flex-col'>
+            <div className='flex flex-1 flex-col gap-3 p-5'>
+              <span className='text-sm font-medium text-slate-200'>
+                Add note
+              </span>
+              {shouldShowOnboarding ? (
+                <p className='text-sm leading-6 text-slate-300'>   
+              Start by <button className='font-medium text-lime-400 hover:underline'>recording an audio</button>, or if you prefer, use <button onClick={handleStartEditor} className='font-medium text-lime-400 hover:underline'>text only</button>
+                </p>
+              ) : (
+                <textarea 
+                  autoFocus
+                  className='text-sm leading-6 text-slate-400 bg-transparent resize-none outline-none flex-1'
+                  onChange={handleContentChange}
+                >
+                </textarea>
+              )
+              }
+            
+            </div>
 
-          <p className='text-sm leading-6 text-slate-300'>   
-            Start by <button className='font-medium text-lime-400 hover:underline'>recording an audio</button>, or if you prefer, use <button className='font-medium text-lime-400 hover:underline'>text only</button>
-          </p>
-          </div>
-
-          <button 
-            type='button'
-            className='w-full bg-lime-400 py-4 text-center text-sm text-lime-950 outline-none font-medium hover:bg-lime-500'
-          >
-            Save note
-          </button>
+            <button 
+              type='submit'
+              className='w-full bg-lime-400 py-4 text-center text-sm text-lime-950 outline-none font-medium hover:bg-lime-500'
+            >
+              Save note
+            </button>
+          </form>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
